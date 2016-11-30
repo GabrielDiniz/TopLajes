@@ -1,0 +1,506 @@
+
+<!-- saved from url=(0029)http://toplajes.kompy.com.br/ -->
+<html><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>:. TopLajes .:</title>
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/momentofletor.js"></script>
+<script type="text/javascript" src="js/kcks.js"></script>
+<script type="text/javascript" src="js/numerobordas.js"></script>
+<script type="text/javascript" src="js/reacaoapoio.js"></script>
+<script type="text/javascript">
+	var lajes = [];
+	var i=0
+// while(lajes.push(new Array(100))<100){i++};
+var horizontal = vertical = 0;
+var horizontalAnterior ;
+var verticalAnterior ;
+var context;
+$(function() {
+	var elem = document.getElementById('canvas');
+	context = elem.getContext('2d');
+	$('#lancar').click(function() {
+		if($('#abaixoDireita').css('display') != 'none'){
+			if ($('#posicao').val() == 'direita') {
+				horizontal=horizontalAnterior;
+				vertical=0;
+				for (var i = 0; i < lajes.length; i++) {
+					if (lajes[i][0]<=horizontalAnterior && lajes[i][2] > horizontalAnterior) {
+						if (lajes[i][3]>vertical) {
+							vertical=lajes[i][3];
+						}
+					}
+				}
+			}else{
+				vertical=0;
+				for (var i = 0; i < lajes.length; i++) {
+					if (lajes[i][0]==0) {
+						if (lajes[i][3]>vertical) {
+							vertical=lajes[i][3];
+						}
+					}
+				}
+				horizontal=0;
+			}
+		}
+		lajes.push([horizontal,vertical,horizontal+$("#lado_horizontal").val()*10,vertical+$("#lado_vertical").val()*10,[[],[],[],[]]]);
+		context.strokeRect(horizontal*2,vertical*2,$("#lado_horizontal").val()*20,$("#lado_vertical").val()*20);
+		
+		$("#abaixoDireita").show();
+		horizontalAnterior = $("#lado_horizontal").val()*10+horizontal;
+		verticalAnterior = $("#lado_vertical").val()*10+vertical;
+		$('#posicao').val('direita');
+	});
+	var maiorD = 0;
+	var alturaUtil;
+	$("#finalizar").click(function() {
+		
+		$("#comodos").hide();
+		$("#especificacoes").show();
+
+		for (var i = 0; i < lajes.length; i++) {
+			for (var j = 0; j < lajes.length; j++) {
+				if (i!=j) {
+					if (lajes[i][1] == lajes[j][3] && ((lajes[i][0] == lajes[j][0]) || (lajes[i][0] < lajes[j][0] && lajes[i][2] > lajes[j][0]) || (lajes[i][0] > lajes[j][0] && lajes[i][0] < lajes[j][2]) )) {
+						lajes[i][4][0].push([j,2]);
+					}
+					if (lajes[i][3] == lajes[j][1] && ((lajes[i][0] == lajes[j][0]) || (lajes[i][0] < lajes[j][0] && lajes[i][2] > lajes[j][0]) || (lajes[i][0] > lajes[j][0] && lajes[i][0] < lajes[j][2]) )) {
+						lajes[i][4][2].push([j,0]);	
+					}
+					if(lajes[i][0] == lajes[j][2] && ((lajes[i][1] == lajes[j][1]) || (lajes[i][1] < lajes[j][1] && lajes[i][3] > lajes[j][1]) || (lajes[i][1] > lajes[j][1] && lajes[i][1] < lajes[j][3]) )){
+						lajes[i][4][3].push([j,1]);
+					}
+					if (lajes[i][2] == lajes[j][0] && ((lajes[i][1] == lajes[j][1]) || (lajes[i][1] < lajes[j][1] && lajes[i][3] > lajes[j][1]) || (lajes[i][1] > lajes[j][1] && lajes[i][1] < lajes[j][3]) )) {
+						lajes[i][4][1].push([j,3]);	
+					}
+
+				}
+			}
+		}
+
+		for (var i = 0; i < lajes.length; i++) {
+			var menor = maior =0;
+			var x = lajes[i][2] - lajes[i][0];
+			var y = lajes[i][3] - lajes[i][1];
+			if (x>y) {
+				if (lajes[i][4][0].length > 0) {
+					maior++;
+				}
+				if (lajes[i][4][1].length > 0) {
+					menor++;
+				}
+				if (lajes[i][4][2].length > 0) {
+					maior++;
+				}
+				if (lajes[i][4][3].length > 0) {
+					menor++;
+				}
+			}else{
+				if (lajes[i][4][0].length > 0) {
+					menor++;
+				}
+				if (lajes[i][4][1].length > 0) {
+					maior++;
+				}
+				if (lajes[i][4][2].length > 0) {
+					menor++;
+				}
+				if (lajes[i][4][3].length > 0) {
+					maior++;
+				}
+			}
+			if (maior == 0) {
+				if (menor==0) {
+					lajes[i][5]='1';
+				}else if(menor==1){
+					lajes[i][5]='2a';
+				}else if(menor==2){
+					lajes[i][5]='4a';
+				}
+			}else if(maior == 1){
+				if (menor==0) {
+					lajes[i][5]='2b';
+				}else if(menor==1){
+					lajes[i][5]='3';
+				}else if(menor==2){
+					lajes[i][5]='5a';
+				}
+			}else if(maior == 2){
+				if (menor==0) {
+					lajes[i][5]='4b';
+				}else if(menor==1){
+					lajes[i][5]='5b';
+				}else if(menor==2){
+					lajes[i][5]='6';
+				}
+			}
+		}
+		for (var i = 0; i < lajes.length; i++) {
+			var lado_horizontal, lado_vertical, maior, menor, l, n;
+			lado_horizontal = (lajes[i][2] - lajes[i][0]) * 10;
+			lado_vertical = (lajes[i][3] - lajes[i][1]) * 10;
+			if (lado_vertical>lado_horizontal) {
+				menor = lado_horizontal;
+				maior = lado_vertical;
+				lajes[i][4][0]['tipo'] = 'menor';
+				lajes[i][4][1]['tipo'] = 'maior';
+				lajes[i][4][2]['tipo'] = 'menor';
+				lajes[i][4][3]['tipo'] = 'maior';
+			}else{
+				lajes[i][4][1]['tipo'] = 'menor';
+				lajes[i][4][0]['tipo'] = 'maior';
+				lajes[i][4][3]['tipo'] = 'menor';
+				lajes[i][4][2]['tipo'] = 'maior';
+				maior = lado_horizontal;
+				menor = lado_vertical;
+			}
+			lajes[i]['lMaior'] = maior;
+			lajes[i]['lMenor'] = menor;
+			if(menor > maior *.7){
+				l = maior *.7;
+			}else{
+				l = menor;
+			}
+			lajes[i]['l']=l;
+			n=0;
+			for (var j = 0; j < lajes[i][4].length; j++) {
+				if(lajes[i][4][j].length>0){
+					n++;
+				}
+			}
+			lajes[i]['n']=n;
+			d = (2.5 - 0.1*lajes[i]['n'])*(lajes[i]['l']/100);
+			lajes[i]['d'] = d;
+			if (d>maiorD) {
+				maiorD = d;
+			}
+		}
+	});
+	$("#form").submit(function() {
+		return false;
+	});
+	$('#calcular').click(function() {
+		var cobrimento = $("#cobrimento").val()*1;
+		var sobrecarga = $('#sobrecarga').val()*1;
+		var aco		   = $('#aco').val()*1;
+		var revestimentoP = $('#revestimentoP').val()*1;
+		var revestimentoE = $('#revestimentoE').val()*1;
+		var concreto = 	 $("#concreto option:selected").val()*1;
+		alturaUtil = Math.ceil(maiorD + cobrimento +0.5);
+		var peso_proprio = (alturaUtil/100)*concreto;
+		var peso_revestimento = (revestimentoE/100)*revestimentoP;
+		var peso_total = sobrecarga*1 + peso_proprio + peso_revestimento;
+
+		for (var i = 0; i < lajes.length; i++) {
+			var lambda = (Math.ceil(((lajes[i]['lMaior']/lajes[i]['lMenor'])*100/5))*5)/100;
+			if (lambda>2) {
+				lambda = 2.01;
+			}
+			lajes[i]['lambda']=lambda;
+			lajes[i]['reacaoapoio'] = [];
+			lajes[i]['momentofletor'] = [];
+			if (lajes[i][5]=="1" || lajes[i][5]=="2a" || lajes[i][5]=="2b" ||lajes[i][5]=="3" ||lajes[i][5]=="4a" ||lajes[i][5]=="5a") {
+				lajes[i]['reacaoapoio']["vx"]=reacaoapoio[lambda.toString()][tipolajeA.indexOf(lajes[i][5]+'vx')] * peso_total * ((lajes[i]['lMenor']/100)/10);
+			}
+			if (lajes[i][5]=="1" ||lajes[i][5]=="2a" || lajes[i][5]=="2b" || lajes[i][5]=="3" || lajes[i][5]=="4b" || lajes[i][5]=="5b") {
+				lajes[i]['reacaoapoio']["vy"]=reacaoapoio[lambda.toString()][tipolajeA.indexOf(lajes[i][5]+'vy')] * peso_total * ((lajes[i]['lMenor']/100)/10);
+			}
+			if (lajes[i][5]=="2a" || lajes[i][5]=="3" || lajes[i][5]=="4a" || lajes[i][5]=="5a" || lajes[i][5]=="5b" || lajes[i][5]=="6" ) {
+				lajes[i]['reacaoapoio']["vyy"]=reacaoapoio[lambda.toString()][tipolajeA.indexOf(lajes[i][5]+'vyy')] * peso_total * ((lajes[i]['lMenor']/100)/10);
+			}
+			if (lajes[i][5]=="2b" || lajes[i][5]=="3" || lajes[i][5]=="4b" || lajes[i][5]=="5a" || lajes[i][5]=="5b" || lajes[i][5]=="6") {
+				lajes[i]['reacaoapoio']["vxx"]=reacaoapoio[lambda.toString()][tipolajeA.indexOf(lajes[i][5]+'vxx')] * peso_total * ((lajes[i]['lMenor']/100)/10);
+			}
+
+			lajes[i]['momentofletor']['mx'] = momentofletor[lambda.toString()][tipolajeF.indexOf(lajes[i][5]+"mx")] * peso_total * (Math.pow((lajes[i]['lMenor']/100),2)/100);
+			lajes[i]['momentofletor']['my'] = momentofletor[lambda.toString()][tipolajeF.indexOf(lajes[i][5]+"my")] * peso_total * (Math.pow((lajes[i]['lMenor']/100),2)/100);
+
+			if (lajes[i][5]=="2b" || lajes[i][5]=="3" || lajes[i][5]=="4b" || lajes[i][5]=="5a" || lajes[i][5]=="5b" || lajes[i][5]=="6") {
+				lajes[i]['momentofletor']['mxx'] = momentofletor[lambda.toString()][tipolajeF.indexOf(lajes[i][5]+"mxx")] * peso_total * (Math.pow((lajes[i]['lMenor']/100),2)/100);
+			}
+			if (lajes[i][5]=="2a" || lajes[i][5]=="3" || lajes[i][5]=="4a" || lajes[i][5]=="5a" || lajes[i][5]=="5b" || lajes[i][5]=="6") {
+				lajes[i]['momentofletor']['myy'] = momentofletor[lambda.toString()][tipolajeF.indexOf(lajes[i][5]+"myy")] * peso_total * (Math.pow((lajes[i]['lMenor']/100),2)/100);
+			}
+			
+		}
+		for (var i = 0; i < lajes.length; i++) {
+			for (var j = 0; j < lajes[i][4].length; j++) {
+				for (var k = 0; k < lajes[i][4][j].length; k++) {
+					if (lajes[i][4][j].length==0) {
+						continue;
+					}
+					if(lajes[i][4][j]['tipo']=='menor'){
+						momentoNegativo1 = lajes[i]['momentofletor']['myy'];
+					}else{
+						momentoNegativo1 = lajes[i]['momentofletor']['mxx'];
+					}
+					if (lajes[lajes[i][4][j][k][0]][4][lajes[i][4][j][k][1]]['tipo']=='menor') {
+						momentoNegativo2 = lajes[lajes[i][4][j][k][0]]['momentofletor']['myy'];
+					}else{					
+						momentoNegativo2 = lajes[lajes[i][4][j][k][0]]['momentofletor']['mxx'];
+					}
+					var maiorMomento = momentoCompatibilizado = 0;
+					if (momentoNegativo1>momentoNegativo2) {
+						maiorMomento = momentoNegativo1;
+					}else{
+						maiorMomento = momentoNegativo2;
+					}
+					if ((momentoNegativo2+momentoNegativo1)/2 > maiorMomento*0.8) {
+						momentoCompatibilizado = (momentoNegativo2+momentoNegativo1)/2;
+					}else{
+						momentoCompatibilizado = maiorMomento*0.8;
+					}
+					
+					for (var l = 0; l < lajes[i][4][j].length; l++) {
+						if (lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]['momentoNegativo'] != undefined && lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]['momentoNegativo'] > momentoCompatibilizado) {
+							momentoCompatibilizado = lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]['momentoNegativo'];
+						}
+						for(var engaste in lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]){
+							if (Array.isArray(lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste])) {								
+								if(lajes[lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][0]][4][lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][1]]['momentoNegativo']  != undefined && lajes[lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][0]][4][lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][1]]['momentoNegativo'] > momentoCompatibilizado ){
+									momentoCompatibilizado = lajes[lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][0]][4][lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][1]]['momentoNegativo'];
+								}
+							}
+						}
+					}
+					lajes[i][4][j]['momentoNegativo'] = momentoCompatibilizado;
+					for (var l = 0; l < lajes[i][4][j].length; l++) {
+						if (lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]['momentoNegativo'] == undefined || lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]['momentoNegativo'] < momentoCompatibilizado) {
+							lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]['momentoNegativo'] = momentoCompatibilizado;
+						}
+						for(var engaste in lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]]){
+							if (Array.isArray(lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste])) {								
+								if(lajes[lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][0]][4][lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][1]]['momentoNegativo']  != undefined && lajes[lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][0]][4][lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][1]]['momentoNegativo'] > momentoCompatibilizado ){
+									lajes[lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][0]][4][lajes[lajes[i][4][j][l][0]][4][lajes[i][4][j][l][1]][engaste][1]]['momentoNegativo'] = momentoCompatibilizado;
+								}
+							}
+						}
+					}
+
+					/*if(lajes[i][4][j]['momentoNegativo'] == undefined || lajes[i][4][j]['momentoNegativo'] < momentoCompatibilizado){
+						lajes[i][4][j]['momentoNegativo'] = momentoCompatibilizado;
+					}
+					if(lajes[lajes[i][4][j][k][0]][4][lajes[i][4][j][k][1]]['momentoNegativo'] == undefined || lajes[lajes[i][4][j][k][0]][4][lajes[i][4][j][k][1]]['momentoNegativo'] < momentoCompatibilizado){
+						lajes[lajes[i][4][j][k][0]][4][lajes[i][4][j][k][1]]['momentoNegativo'] = momentoCompatibilizado;
+					}*/
+					
+				}
+			}
+		}
+
+		var momentoMajorado,kc,ks,areaAco,areaMinimaSecundaria;
+		var areaMinima = 0.15*alturaUtil;
+		var dLinha
+		for (var i = 0; i < lajes.length; i++) {
+			for (var j = 0; j < lajes[i][4].length; j++) {
+				var podeCalcular = true;
+				for (var k = 0; k <  lajes[i][4][j].length; k++) {
+					if(lajes[lajes[i][4][j][k][0]][4][lajes[i][4][j][k][1]]['areaNegativo']!=undefined){
+						podeCalcular=false;
+						break;
+					}
+				}
+				if ( lajes[i][4][j]['momentoNegativo'] != undefined && podeCalcular) {
+					momentoMajorado = lajes[i][4][j]['momentoNegativo']*140;
+
+					kc = (100*Math.pow((alturaUtil-cobrimento-0.5),2))/momentoMajorado;
+					for (var k = 0; k < bdKC[concreto].length; k++) {
+						if(bdKC[concreto][k] > kc){
+							ks = bdKS[aco][k-1];
+						}else{
+							break;
+						}
+					}
+					areaAco = ks*momentoMajorado/(alturaUtil-cobrimento-0.5);
+					if (areaAco<areaMinima){
+						areaAco = areaMinima;
+					}
+					lajes[i][4][j]['areaNegativo'] = areaAco;
+				}
+			}
+			areaAco = ks*(lajes[i]['momentofletor']['mx']*140)/(alturaUtil-cobrimento-0.5);
+			if (areaAco<areaMinima){
+				areaAco = areaMinima;
+			}
+			lajes[i]['armaduraPrincipal'] = areaAco;
+
+			areaAco = ks*(lajes[i]['momentofletor']['my']*140)/(alturaUtil-cobrimento-0.5);
+			if (lajes[i]['lambda']>2) {
+				if (areaAco < 0.2*lajes[i]['armaduraPrincipal']) {
+					areaMinimaSecundaria = 0.2*lajes[i]['armaduraPrincipal']
+				}
+				if (areaAco<areaMinimaSecundaria){
+					areaAco = areaMinimaSecundaria;
+				}
+				if (areaAco < 0.5*areaMinima) {
+					areaAco = 0.5*areaMinima;
+				}
+				if (areaAco<0.9) {
+					areaAco = 0.9;
+				}
+			}else{
+				if (areaAco<areaMinima){
+					areaAco = areaMinima;
+				}	
+			}
+
+			lajes[i]['armaduraSecundaria'] = areaAco;
+
+		}
+		var legendaX,legendaY;
+		var espacoY = 3;
+		var espacoX = 15;
+		context.font = "7px Arial";
+		for (var i = 0; i < lajes.length; i++) {
+			for (var j = 0; j < lajes[i][4].length; j++) {
+				if (lajes[i][4][j]['areaNegativo'] != undefined) {
+					if (j==0) {
+						legendaY = lajes[i][1]*2+espacoY;
+						legendaX = lajes[i][0]*2 + (lajes[i][2]*2 - lajes[i][0]*2)/2 - (espacoX/2);
+					}else if(j==1){						
+						legendaY = lajes[i][1]*2 + (lajes[i][3]*2 - lajes[i][1]*2)/2 - (espacoY);
+						legendaX = lajes[i][2]*2 - espacoX;
+					}else if (j==2) {						
+						legendaY = lajes[i][3]*2-3;
+						legendaX = lajes[i][0]*2 + (lajes[i][2]*2 - lajes[i][0]*2)/2 - (espacoX/2);
+					}else{
+						legendaY = lajes[i][1]*2 + (lajes[i][3]*2 - lajes[i][1]*2)/2 - (espacoY -3);
+						legendaX = lajes[i][0]*2 + 3;
+					}
+					context.fillText(lajes[i][4][j]['areaNegativo'].toFixed(2).toString(),legendaX,legendaY);
+				}
+			}
+			legendaX = lajes[i][0]*2 + (lajes[i][2]*2 - lajes[i][0]*2)/2 - (espacoX/2);
+			legendaY = lajes[i][1]*2 + (lajes[i][3]*2 - lajes[i][1]*2)/2 + 3;
+			context.fillText(lajes[i]['armaduraPrincipal'].toFixed(2).toString(),legendaX,legendaY);
+		}
+	});
+});
+</script>
+</head>
+
+<body>
+	<form id="form">
+	<div class="container">
+		<div class="row">
+				<div class="col-xs-12">
+					<canvas id="canvas" width="340" height="300" style="border:1px solid #aaa;margin-top: 20px"> 
+						Se seu navegador não suportar HTML5 você verá esta mensagem. 
+					</canvas> 
+				</div>
+			</div>
+	</div>
+		<div id="comodos" class="container">
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<label for="lado_horizontal">Lado horizontal:</label>
+					<input class="form-control" type="text" id="lado_horizontal" placeholder="Em metros">
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<label for="lado_vertical">Lado vertical:</label>
+					<input class="form-control" type="text" id="lado_vertical" placeholder="Em metros"> 
+				</div>
+			</div>
+			<div class="form-group row" id="abaixoDireita" style="display: none;">
+				<div class="col-xs-12">
+					<label for="posicao">Adicionar o próximo Cômodo</label>
+					<select class="form-control" id="posicao">
+						<option value="direita">Direita</option>
+						<option value="abaixo">Abaixo</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<button id="lancar" class="btn btn-primary">Adicionar Cômodo</button>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<div>Definição dos Lados :</div>
+					<div>
+						<div>λ = l<sub>y</sub> / l<sub>x</sub> &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-family:sans-serif">→</span> </div>
+					</div>
+					<div><div id="lambda"></div></div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12"><button id="finalizar" class="btn btn-success">Finalizar Planta</button></div>
+			</div>
+		</div>
+		<div id="especificacoes" class="container" style="display: none;">
+			<div class="form-group row">
+				
+				<div class="col-xs-12">
+					<label for="concreto">FCK Concreto:</label>
+					<select class="form-control" id="concreto">
+						<option value="10">10 MPa</option>
+						<option value="15">15 MPa</option>
+						<option value="20">20 MPa</option>
+						<option value="25" selected="selected">25 MPa</option>
+						<option value="30">30 MPa</option>
+						<option value="35">35 MPa</option>
+						<option value="40">40 MPa</option>
+						<option value="45">45 MPa</option>
+						<option value="50">50 MPa</option>
+					</select>
+				</div>
+				
+			</div>
+			<div class="form-group row">
+				
+				<div class="col-xs-12">
+					<label for="aco">Tipo de aço:</label>
+					<select class="form-control" id="aco">
+						<option value="25">CA-25</option>
+						<option value="50" selected="selected">CA-50</option>
+						<option value="60">CA-60</option>
+					</select>
+				</div>
+				
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<label for="sobrecarga">Sobrecarga da Laje:</label>
+					<input class="form-control" type="text" id="sobrecarga" placeholder="KN/m2" value="4">
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<label for="revestimentoP">Peso do Revestimento:</label>
+					<input class="form-control" type="text" id="revestimentoP" placeholder="KN/m2" value="21">
+				</div>
+				
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<label for="revestimentoE">Espessura do Revestimento:</label>
+					<input class="form-control" type="text" id="revestimentoE" placeholder="Em centímetros" value="2.5">
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-xs-12">
+					<label for="cobrimento">Cobrimento</label>
+					<input class="form-control" type="text" name="cobrimento" id="cobrimento" placeholder="Em centímetros" value="2">
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-xs-12"><button id="calcular" class="btn btn-success">Calcular Laje</button></div>
+			</div>
+		</div>
+	</form>
+</body>
+</html>
