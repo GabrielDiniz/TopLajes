@@ -18,6 +18,9 @@
 <script type="text/javascript" src="js/numerobordas.js"></script>
 <script type="text/javascript" src="js/reacaoapoio.js"></script>
 <script type="text/javascript">
+	function format(nun) {
+		return nun.replace(',','.');
+	}
 	var lajes = [];
 	var i=0
 // while(lajes.push(new Array(100))<100){i++};
@@ -28,7 +31,15 @@ var context;
 $(function() {
 	var elem = document.getElementById('canvas');
 	context = elem.getContext('2d');
+	$('#voltar').click(function() {
+		$("#comodos").show();
+		$("#especificacoes").hide();
+	});
+	$('#novo').click(function() {
+		location.href = location.href;
+	});
 	$('#lancar').click(function() {
+		$("#finalizar").show();
 		if($('#abaixoDireita').css('display') != 'none'){
 			if ($('#posicao').val() == 'direita') {
 				horizontal=horizontalAnterior;
@@ -52,12 +63,12 @@ $(function() {
 				horizontal=0;
 			}
 		}
-		lajes.push([horizontal,vertical,horizontal+$("#lado_horizontal").val()*10,vertical+$("#lado_vertical").val()*10,[[],[],[],[]]]);
-		context.strokeRect(horizontal*2,vertical*2,$("#lado_horizontal").val()*20,$("#lado_vertical").val()*20);
+		lajes.push([horizontal,vertical,horizontal+format($("#lado_horizontal").val())*10,vertical+format($("#lado_vertical").val())*10,[[],[],[],[]]]);
+		context.strokeRect(horizontal*2,vertical*2,format($("#lado_horizontal").val())*20,format($("#lado_vertical").val())*20);
 		
 		$("#abaixoDireita").show();
-		horizontalAnterior = $("#lado_horizontal").val()*10+horizontal;
-		verticalAnterior = $("#lado_vertical").val()*10+vertical;
+		horizontalAnterior = format($("#lado_horizontal").val())*10+horizontal;
+		verticalAnterior = format($("#lado_vertical").val())*10+vertical;
 		$('#posicao').val('direita');
 	});
 	var maiorD = 0;
@@ -69,6 +80,7 @@ $(function() {
 
 		for (var i = 0; i < lajes.length; i++) {
 			for (var j = 0; j < lajes.length; j++) {
+				lajes[i][4] = [[],[],[],[]];
 				if (i!=j) {
 					if (lajes[i][1] == lajes[j][3] && ((lajes[i][0] == lajes[j][0]) || (lajes[i][0] < lajes[j][0] && lajes[i][2] > lajes[j][0]) || (lajes[i][0] > lajes[j][0] && lajes[i][0] < lajes[j][2]) )) {
 						lajes[i][4][0].push([j,2]);
@@ -189,12 +201,16 @@ $(function() {
 		return false;
 	});
 	$('#calcular').click(function() {
-		var cobrimento = $("#cobrimento").val()*1;
-		var sobrecarga = $('#sobrecarga').val()*1;
-		var aco		   = $('#aco').val()*1;
-		var revestimentoP = $('#revestimentoP').val()*1;
-		var revestimentoE = $('#revestimentoE').val()*1;
-		var concreto = 	 $("#concreto option:selected").val()*1;
+		$("#calcular").hide();
+		$("#lancar").hide();
+		$("#finalizar").html('Ver Resultado');
+		scrollTo(0,0);
+		var cobrimento = format($("#cobrimento").val())*1;
+		var sobrecarga = format($('#sobrecarga').val())*1;
+		var aco		   = format($('#aco').val())*1;
+		var revestimentoP = format($('#revestimentoP').val())*1;
+		var revestimentoE = format($('#revestimentoE').val())*1;
+		var concreto = 	 format($("#concreto option:selected").val())*1;
 		alturaUtil = Math.ceil(maiorD + cobrimento +0.5);
 		var peso_proprio = (alturaUtil/100)*concreto;
 		var peso_revestimento = (revestimentoE/100)*revestimentoP;
@@ -327,12 +343,29 @@ $(function() {
 					lajes[i][4][j]['areaNegativo'] = areaAco;
 				}
 			}
+
+			kc = (100*Math.pow((alturaUtil-cobrimento-0.5),2))/(lajes[i]['momentofletor']['mx']*140);
+			for (var k = 0; k < bdKC[concreto].length; k++) {
+				if(bdKC[concreto][k] > kc){
+					ks = bdKS[aco][k-1];
+				}else{
+					break;
+				}
+			}
 			areaAco = ks*(lajes[i]['momentofletor']['mx']*140)/(alturaUtil-cobrimento-0.5);
 			if (areaAco<areaMinima){
 				areaAco = areaMinima;
 			}
 			lajes[i]['armaduraPrincipal'] = areaAco;
 
+			kc = (100*Math.pow((alturaUtil-cobrimento-0.5),2))/(lajes[i]['momentofletor']['my']*140);
+			for (var k = 0; k < bdKC[concreto].length; k++) {
+				if(bdKC[concreto][k] > kc){
+					ks = bdKS[aco][k-1];
+				}else{
+					break;
+				}
+			}
 			areaAco = ks*(lajes[i]['momentofletor']['my']*140)/(alturaUtil-cobrimento-0.5);
 			if (lajes[i]['lambda']>2) {
 				if (areaAco < 0.2*lajes[i]['armaduraPrincipal']) {
@@ -390,15 +423,15 @@ $(function() {
 
 <body>
 	<form id="form">
-	<div class="container">
-		<div class="row">
+		<div class="container">
+			<div class="row">
 				<div class="col-xs-12">
-					<canvas id="canvas" width="340" height="300" style="border:1px solid #aaa;margin-top: 20px"> 
-						Se seu navegador não suportar HTML5 você verá esta mensagem. 
+					<canvas id="canvas" height="225" style="border:1px solid #aaa;margin-top: 20px;width: 100%;"> 
+						Seu dispositivo não é compatível com a tecnolgia Canvas. Desculpe :(
 					</canvas> 
 				</div>
 			</div>
-	</div>
+		</div>
 		<div id="comodos" class="container">
 			<div class="form-group row">
 				<div class="col-xs-12">
@@ -428,16 +461,7 @@ $(function() {
 			</div>
 
 			<div class="form-group row">
-				<div class="col-xs-12">
-					<div>Definição dos Lados :</div>
-					<div>
-						<div>λ = l<sub>y</sub> / l<sub>x</sub> &nbsp; &nbsp; &nbsp; &nbsp; <span style="font-family:sans-serif">→</span> </div>
-					</div>
-					<div><div id="lambda"></div></div>
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-xs-12"><button id="finalizar" class="btn btn-success">Finalizar Planta</button></div>
+				<div class="col-xs-12"><button id="finalizar" class="btn btn-success" style="display: none;">Finalizar Planta</button></div>
 			</div>
 		</div>
 		<div id="especificacoes" class="container" style="display: none;">
@@ -474,31 +498,31 @@ $(function() {
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="sobrecarga">Sobrecarga da Laje:</label>
-					<input class="form-control" type="text" id="sobrecarga" placeholder="KN/m2" value="4">
+					<input class="form-control" type="text" id="sobrecarga" placeholder="KN/m2">
 				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="revestimentoP">Peso do Revestimento:</label>
-					<input class="form-control" type="text" id="revestimentoP" placeholder="KN/m2" value="21">
+					<input class="form-control" type="text" id="revestimentoP" placeholder="KN/m2">
 				</div>
 				
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="revestimentoE">Espessura do Revestimento:</label>
-					<input class="form-control" type="text" id="revestimentoE" placeholder="Em centímetros" value="2.5">
+					<input class="form-control" type="text" id="revestimentoE" placeholder="Em centímetros">
 				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="cobrimento">Cobrimento</label>
-					<input class="form-control" type="text" name="cobrimento" id="cobrimento" placeholder="Em centímetros" value="2">
+					<input class="form-control" type="text" name="cobrimento" id="cobrimento" placeholder="Em centímetros">
 				</div>
 			</div>
 			
 			<div class="form-group row">
-				<div class="col-xs-12"><button id="calcular" class="btn btn-success">Calcular Laje</button></div>
+				<div class="col-xs-12"><button id="calcular" class="btn btn-success">Calcular Laje</button><button id="voltar" class="btn btn-primary">Voltar</button><button id="novo" class="btn btn-primary">Novo Cálculo</button></div>
 			</div>
 		</div>
 	</form>
