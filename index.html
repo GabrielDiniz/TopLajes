@@ -445,13 +445,13 @@ $(function() {
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="lado_horizontal">Lado horizontal:</label>
-					<input class="form-control" type="text" id="lado_horizontal" placeholder="Em metros">
+					<input class="form-control" type="number" step="0.01" min="0" id="lado_horizontal" placeholder="Em metros">
 				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="lado_vertical">Lado vertical:</label>
-					<input class="form-control" type="text" id="lado_vertical" placeholder="Em metros"> 
+					<input class="form-control" type="number" step="0.01" min="0" id="lado_vertical" placeholder="Em metros"> 
 				</div>
 			</div>
 			<div class="form-group row" id="abaixoDireita" style="display: none;">
@@ -507,26 +507,26 @@ $(function() {
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="sobrecarga">Sobrecarga da Laje:</label>
-					<input class="form-control" type="text" id="sobrecarga" placeholder="KN/m2">
+					<input class="form-control" type="number" step="0.01" min="0" id="sobrecarga" placeholder="KN/m2">
 				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="revestimentoP">Peso do Revestimento:</label>
-					<input class="form-control" type="text" id="revestimentoP" placeholder="KN/m2">
+					<input class="form-control" type="number" step="0.01" min="0" id="revestimentoP" placeholder="KN/m2">
 				</div>
 				
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="revestimentoE">Espessura do Revestimento:</label>
-					<input class="form-control" type="text" id="revestimentoE" placeholder="Em centímetros">
+					<input class="form-control" type="number" step="0.1" min="0" id="revestimentoE" placeholder="Em centímetros">
 				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-xs-12">
 					<label for="cobrimento">Cobrimento</label>
-					<input class="form-control" type="text" name="cobrimento" id="cobrimento" placeholder="Em centímetros">
+					<input class="form-control" type="number" step="0.1" min="0" name="cobrimento" id="cobrimento" placeholder="Em centímetros">
 				</div>
 			</div>
 			
